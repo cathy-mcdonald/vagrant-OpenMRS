@@ -1,17 +1,19 @@
 class xvfb {
-  package { 'xvfb':
+  package { "xvfb":
     ensure => "installed",
   }
 
-  file { '/etc/profile.d/set_xvfb_display.sh':
-    ensure => present,
-    source => "puppet:///modules/xvfb/set_xvfb_display.sh",
-    owner => "root",
-    group => "root",
+  file { "/etc/init.d/xvfb":
+    source => "puppet:///modules/xvfb/xvfb.init",
     mode => 755,
   }
 
-  exec { 'xvfb':
-    command => "/usr/bin/X11/Xvfb :99 >>/home/vagrant/tmp/xvfb.out 2>&1 &",    
+  service { "xvfb":
+    ensure => running,
+    enable => true,
+    hasstatus => true,
+    hasrestart => true,
   }
+
+  Package["xvfb"] -> File["/etc/init.d/xvfb"] -> Service["xvfb"]
 }
